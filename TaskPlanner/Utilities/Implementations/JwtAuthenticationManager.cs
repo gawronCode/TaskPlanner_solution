@@ -26,7 +26,6 @@ namespace TaskPlanner.Utilities.Implementations
 
         public string Authenticate(string username, string password)
         {
-            // if (_users.Any(q => q.Key != username && q.Value != password)) return null;
 
             if (!_users.ContainsKey(username)) return null;
             if (_users[username] != password) return null;

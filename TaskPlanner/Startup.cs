@@ -12,7 +12,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using TaskPlanner.Data;
 using TaskPlanner.Utilities.Implementations;
 using TaskPlanner.Utilities.Interfaces;
 
@@ -31,9 +33,12 @@ namespace TaskPlanner
         public void ConfigureServices(IServiceCollection services)
         {
 
-            var key = "very-complex-password";
+            services.AddDbContext<TaskPlannerDbContext>(options =>
+                options.UseSqlServer(Configuration.GetConnectionString("DbConnectionString")));
+
 
             // nuget Microsoft.AspNetCore.Authentication.JwtBearer
+            const string key = "very-complex-password";
             services.AddAuthentication(q =>
             {
                 q.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -56,7 +61,6 @@ namespace TaskPlanner
             services.AddSingleton<IJwtAuthenticationManager>(new JwtAuthenticationManager(key));
             services.AddControllers();
         }
-
 
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
