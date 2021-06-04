@@ -15,6 +15,9 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using TaskPlanner.Data;
+using TaskPlanner.Models.DbModels;
+using TaskPlanner.Repositories.Implementations;
+using TaskPlanner.Repositories.Interfaces;
 using TaskPlanner.Utilities.Implementations;
 using TaskPlanner.Utilities.Interfaces;
 
@@ -38,7 +41,6 @@ namespace TaskPlanner
 
 
             // nuget Microsoft.AspNetCore.Authentication.JwtBearer
-            const string key = "very-complex-password";
             services.AddAuthentication(q =>
             {
                 q.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -50,15 +52,18 @@ namespace TaskPlanner
                 q.TokenValidationParameters = new TokenValidationParameters
                 {
                     ValidateIssuerSigningKey = true,
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(key)),
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(KeyHolder.GetKey())),
                     ValidateIssuer = false,
                     ValidateAudience = false,
                     ValidateLifetime = true,
                     ClockSkew = TimeSpan.Zero
                 };
             });
+            
+            services.AddScoped<IHashManager, HashManager>();
+            services.AddScoped<IUserRepo, UserRepo>();
+            services.AddScoped<IJwtAuthenticationManager, JwtAuthenticationManager>();
 
-            services.AddSingleton<IJwtAuthenticationManager>(new JwtAuthenticationManager(key));
             services.AddControllers();
         }
 

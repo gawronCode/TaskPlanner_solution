@@ -6,6 +6,7 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.IdentityModel.Tokens;
+using TaskPlanner.Repositories.Interfaces;
 using TaskPlanner.Utilities.Interfaces;
 
 namespace TaskPlanner.Utilities.Implementations
@@ -15,28 +16,30 @@ namespace TaskPlanner.Utilities.Implementations
         // nuget Microsoft.AspNetCore.Authentication is needed
         // nuget System.IdentityModel.Tokens.Jwt is needed
 
-        private readonly IDictionary<string, string> _users = new Dictionary<string, string>
-            {{"user1", "password1"}, {"user2", "password2"}, {"user3", "password3"} };
+        private readonly IUserRepo _userRepo;
+        private readonly IHashManager _hashManager;
 
-        private readonly string _key;
-        public JwtAuthenticationManager(string key)
+        public JwtAuthenticationManager(IUserRepo userRepo,
+                                        IHashManager hashManager)
         {
-            _key = key;
+            _userRepo = userRepo;
+            _hashManager = hashManager;
         }
 
-        public string Authenticate(string username, string password)
+        public async Task<string> Authenticate(string email, string password)
         {
 
-            if (!_users.ContainsKey(username)) return null;
-            if (_users[username] != password) return null;
-
+            var user = await _userRepo.GetByEmailAsync(email);
+            if (user is null) return null;
+            if (!_hashManager.CompareAgainstHash(password, user.PasswordHash)) return null;
+            
             var tokenHandler = new JwtSecurityTokenHandler();
-            var tokenKey = Encoding.ASCII.GetBytes(_key);
+            var tokenKey = Encoding.ASCII.GetBytes(KeyHolder.GetKey());
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(new Claim[]
                 {
-                    new Claim(ClaimTypes.Name, username)
+                    new Claim(ClaimTypes.Email, email)
                 }),
                 Expires = DateTime.UtcNow.AddDays(1),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(tokenKey),
