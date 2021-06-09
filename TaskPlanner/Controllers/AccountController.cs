@@ -32,7 +32,7 @@ namespace TaskPlanner.Controllers
         [HttpGet]
         public async Task<IActionResult> Get()
         {
-            var email = User.FindFirst(ClaimTypes.Email).Value;
+            var email = User.FindFirst(ClaimTypes.Email)?.Value;
             var name = (await _userRepo.GetByEmailAsync(email)).Name;
             // Thread.Sleep(5000);
             return Ok(new {name = name, email = email});
@@ -41,7 +41,7 @@ namespace TaskPlanner.Controllers
         [HttpPut]
         public async Task<IActionResult> UpdateCredentials(UserRegisterDto userRegisterDto)
         {
-            var email = User.FindFirst(ClaimTypes.Email).Value;
+            var email = User.FindFirst(ClaimTypes.Email)?.Value;
             var user = await _userRepo.GetByEmailAsync(email);
 
             user.Name = string.IsNullOrEmpty(userRegisterDto.Name) ? user.Name : userRegisterDto.Name;
@@ -55,9 +55,12 @@ namespace TaskPlanner.Controllers
         }
 
         [HttpDelete]
-        public IActionResult DeleteAccount()
+        public async Task<IActionResult> DeleteAccount()
         {
-            return Ok(new { content = "Delete is working" });
+            var email = User.FindFirst(ClaimTypes.Email)?.Value;
+            var user = await _userRepo.GetByEmailAsync(email);
+            await _userRepo.DeleteAsync(user);
+            return NoContent();
         }
 
 
