@@ -9,8 +9,8 @@ using TaskPlanner.Models.DbModels;
 using TaskPlanner.Models.DtoModels;
 using TaskPlanner.Repositories.Interfaces;
 using TaskPlanner.Utilities.Interfaces;
+using Task = TaskPlanner.Models.DbModels.Task;
 
-// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace TaskPlanner.Controllers
 {
@@ -53,11 +53,16 @@ namespace TaskPlanner.Controllers
 
         [AllowAnonymous]
         [HttpPost]
-        public async Task<IActionResult> Authenticate([FromBody] UserCredentialsDto userCredentials)
+        public async Task<ActionResult<TokenDto>> Authenticate([FromBody] UserCredentialsDto userCredentials)
         {
             var token =  await _jwtAuthenticationManager.Authenticate(userCredentials.Email, userCredentials.Password);
             if(string.IsNullOrEmpty(token)) return Unauthorized();
-            return Ok(token);
+            var name = (await _userRepo.GetByEmailAsync(userCredentials.Email)).Name;
+            return Ok(new TokenDto
+            {
+                User = name,
+                Token = token
+            });
         }
 
 
@@ -65,6 +70,8 @@ namespace TaskPlanner.Controllers
         [HttpPost]
         public async Task<IActionResult> RegisterUser([FromBody] UserRegisterDto userRegister)
         {
+            var existingUser = await _userRepo.GetByEmailAsync(userRegister.Email);
+            if (existingUser is not null) return Problem();
             var passwordHash = _hashManager.CreateHash(userRegister.Password);
             var user = new User
             {
@@ -75,8 +82,16 @@ namespace TaskPlanner.Controllers
             var success = await _userRepo.CreateAsync(user);
             if (success) return Ok();
 
-            return NotFound();
+            return Problem();
 
+        }
+
+        [AllowAnonymous]
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<User>>> GetTest()
+        {
+            var users = await _userRepo.GetAllAsync();
+            return Ok(users);
         }
 
     }

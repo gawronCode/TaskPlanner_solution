@@ -59,7 +59,16 @@ namespace TaskPlanner
                     ClockSkew = TimeSpan.Zero
                 };
             });
-            
+
+
+            services.AddCors(options =>
+            {
+                options.AddDefaultPolicy(builder =>
+                {
+                    builder.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin();
+                });
+            });
+
             services.AddScoped<IHashManager, HashManager>();
             services.AddScoped<IUserRepo, UserRepo>();
             services.AddScoped<IJwtAuthenticationManager, JwtAuthenticationManager>();
@@ -77,6 +86,8 @@ namespace TaskPlanner
             }
 
             app.UseHttpsRedirection();
+
+            app.UseCors();
 
             app.UseRouting();
             app.UseAuthentication();

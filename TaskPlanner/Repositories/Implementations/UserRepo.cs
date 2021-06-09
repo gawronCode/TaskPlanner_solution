@@ -32,9 +32,10 @@ namespace TaskPlanner.Repositories.Implementations
             return await SaveAsync();
         }
 
-        public Task<ICollection<User>> GetAllAsync()
+        public async Task<ICollection<User>> GetAllAsync()
         {
-            throw new NotImplementedException();
+            var users = await _context.Users.ToListAsync();
+            return users;
         }
 
         public Task<User> GetByIdAsync(int id)
@@ -54,9 +55,10 @@ namespace TaskPlanner.Repositories.Implementations
             return changes > 0;
         }
 
-        public Task<bool> UpdateAsync(User entity)
+        public async Task<bool> UpdateAsync(User entity)
         {
-            throw new NotImplementedException();
+            _context.Users.Update(entity);
+            return await SaveAsync();
         }
     }
 }
