@@ -21,11 +21,15 @@ namespace TaskPlanner.Controllers
 
         private readonly IUserRepo _userRepo;
         private readonly IHashManager _hashManager;
+        private readonly IJwtAuthenticationManager _jwtAuthenticationManager;
 
-        public AccountController(IUserRepo userRepo, IHashManager hashManager)
+        public AccountController(IUserRepo userRepo,
+                                IHashManager hashManager,
+                                IJwtAuthenticationManager jwtAuthenticationManager)
         {
             _userRepo = userRepo;
             _hashManager = hashManager;
+            _jwtAuthenticationManager = jwtAuthenticationManager;
         }
 
 
@@ -39,20 +43,47 @@ namespace TaskPlanner.Controllers
         }
 
         [HttpPut]
-        public async Task<IActionResult> UpdateCredentials(UserRegisterDto userRegisterDto)
+        public async Task<IActionResult> UpdateName(UserRegisterDto userRegisterDto)
         {
             var email = User.FindFirst(ClaimTypes.Email)?.Value;
             var user = await _userRepo.GetByEmailAsync(email);
 
             user.Name = string.IsNullOrEmpty(userRegisterDto.Name) ? user.Name : userRegisterDto.Name;
-            user.Email = string.IsNullOrEmpty(userRegisterDto.Email) ? user.Email : userRegisterDto.Email;
-            user.PasswordHash = string.IsNullOrEmpty(userRegisterDto.Password)
-                ? user.PasswordHash
-                : _hashManager.CreateHash(userRegisterDto.Password);
-
+            //TODO Ogarnąć czemu zapytanie z postmana przechodzi redirecta a z aplikacji angulara nie
+            // user.PasswordHash = string.IsNullOrEmpty(userRegisterDto.Password)
+            //     ? user.PasswordHash
+            //     : _hashManager.CreateHash(userRegisterDto.Password);
+            //
+            // if (!string.IsNullOrEmpty(userRegisterDto.Email))
+            // {
+            //     user.Email = userRegisterDto.Email;
+            //     await _userRepo.UpdateAsync(user);
+            //     // return RedirectToAction("GetNewToken", "Authentication", new { email = userRegisterDto.Email });
+            //     return RedirectToAction(nameof(GetNewToken), new { email = userRegisterDto.Email });
+            //
+            // }
             await _userRepo.UpdateAsync(user);
             return NoContent();
         }
+
+        [HttpPut]
+        public async Task<ActionResult<TokenDto>> UpdateEmail(UserRegisterDto userRegisterDto)
+        {
+            if(await _userRepo.GetByEmailAsync(userRegisterDto.Email) is not null) return Problem();
+
+            var email = User.FindFirst(ClaimTypes.Email)?.Value;
+            var user = await _userRepo.GetByEmailAsync(email);
+            user.Email = string.IsNullOrEmpty(userRegisterDto.Email) ? user.Email : userRegisterDto.Email;
+            await _userRepo.UpdateAsync(user);
+            var token = _jwtAuthenticationManager.GetToken(user.Email);
+            return Ok(new TokenDto
+            {
+                Token = token,
+                User = user.Name
+            });
+
+        }
+
 
         [HttpDelete]
         public async Task<IActionResult> DeleteAccount()

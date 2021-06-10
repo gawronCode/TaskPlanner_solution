@@ -33,6 +33,11 @@ namespace TaskPlanner.Utilities.Implementations
             if (user is null) return null;
             if (!_hashManager.CompareAgainstHash(password, user.PasswordHash)) return null;
             
+            return GetToken(email);
+        }
+
+        public string GetToken(string email)
+        {
             var tokenHandler = new JwtSecurityTokenHandler();
             var tokenKey = Encoding.ASCII.GetBytes(KeyHolder.GetKey());
             var tokenDescriptor = new SecurityTokenDescriptor
@@ -48,5 +53,6 @@ namespace TaskPlanner.Utilities.Implementations
             var token = tokenHandler.CreateToken(tokenDescriptor);
             return tokenHandler.WriteToken(token);
         }
+
     }
 }

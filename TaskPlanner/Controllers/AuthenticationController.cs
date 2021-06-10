@@ -65,7 +65,6 @@ namespace TaskPlanner.Controllers
             });
         }
 
-
         [AllowAnonymous]
         [HttpPost]
         public async Task<IActionResult> RegisterUser([FromBody] UserRegisterDto userRegister)
@@ -85,6 +84,22 @@ namespace TaskPlanner.Controllers
             return Problem();
 
         }
+
+
+        // [HttpGet("{email}" ,Name = "GetNewToken")]
+        // public async Task<ActionResult<TokenDto>> GetNewToken(string email)
+        // {
+        //     var token = _jwtAuthenticationManager.GetToken(email);
+        //     var user = await _userRepo.GetByEmailAsync(email);
+        //     if (user is null) return Problem();
+        //
+        //     return Ok(new TokenDto
+        //     {
+        //         Token = token,
+        //         User = user.Name
+        //     });
+        //
+        // }
 
         [AllowAnonymous]
         [HttpGet]

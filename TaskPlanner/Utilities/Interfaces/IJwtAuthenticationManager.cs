@@ -9,5 +9,6 @@ namespace TaskPlanner.Utilities.Interfaces
     public interface IJwtAuthenticationManager
     {
         public Task<string> Authenticate(string email, string password);
+        public string GetToken(string email);
     }
 }
