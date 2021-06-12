@@ -84,6 +84,20 @@ namespace TaskPlanner.Controllers
 
         }
 
+        [HttpPut]
+        public async Task<ActionResult> UpdatePassword(UserRegisterDto userRegisterDto)
+        {
+            var email = User.FindFirst(ClaimTypes.Email)?.Value;
+            var user = await _userRepo.GetByEmailAsync(email);
+
+            user.PasswordHash = string.IsNullOrEmpty(userRegisterDto.Password)
+                ? user.PasswordHash
+                : _hashManager.CreateHash(userRegisterDto.Password);
+
+            await _userRepo.UpdateAsync(user);
+            return Ok();
+        }
+
 
         [HttpDelete]
         public async Task<IActionResult> DeleteAccount()
