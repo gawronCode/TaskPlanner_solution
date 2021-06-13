@@ -99,11 +99,16 @@ namespace TaskPlanner.Controllers
         }
 
 
-        [HttpDelete]
-        public async Task<IActionResult> DeleteAccount()
+        [HttpPost]
+        public async Task<IActionResult> DeleteAccount(UserCredentialsDto userCredentialsDto)
         {
+
             var email = User.FindFirst(ClaimTypes.Email)?.Value;
             var user = await _userRepo.GetByEmailAsync(email);
+
+            if (!_hashManager.CompareAgainstHash(userCredentialsDto.Password, user.PasswordHash))
+                return ValidationProblem();
+
             await _userRepo.DeleteAsync(user);
             return NoContent();
         }
