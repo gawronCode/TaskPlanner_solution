@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using TaskPlanner.Models.DbModels;
-using Task = TaskPlanner.Models.DbModels.Task;
 
 namespace TaskPlanner.Data
 {
@@ -16,8 +15,6 @@ namespace TaskPlanner.Data
         }
 
         public DbSet<User> Users { get; set; }
-        public DbSet<Task> Tasks { get; set; }
-        public DbSet<TaskWork> TaskWorks { get; set; }
         public DbSet<Event> Events { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

@@ -9,7 +9,6 @@ using TaskPlanner.Models.DbModels;
 using TaskPlanner.Models.DtoModels;
 using TaskPlanner.Repositories.Interfaces;
 using TaskPlanner.Utilities.Interfaces;
-using Task = TaskPlanner.Models.DbModels.Task;
 
 
 namespace TaskPlanner.Controllers

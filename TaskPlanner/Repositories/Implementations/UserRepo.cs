@@ -6,7 +6,6 @@ using Microsoft.EntityFrameworkCore;
 using TaskPlanner.Data;
 using TaskPlanner.Models.DbModels;
 using TaskPlanner.Repositories.Interfaces;
-using Task = TaskPlanner.Models.DbModels.Task;
 
 namespace TaskPlanner.Repositories.Implementations
 {

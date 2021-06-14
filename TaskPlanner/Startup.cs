@@ -71,6 +71,7 @@ namespace TaskPlanner
 
             services.AddScoped<IHashManager, HashManager>();
             services.AddScoped<IUserRepo, UserRepo>();
+            services.AddScoped<IEventRepo, EventRepo>();
             services.AddScoped<IJwtAuthenticationManager, JwtAuthenticationManager>();
 
             services.AddControllers();

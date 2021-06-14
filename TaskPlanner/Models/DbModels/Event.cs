@@ -12,9 +12,8 @@ namespace TaskPlanner.Models.DbModels
         [Required]
         public int Id { get; set; }
         [Required]
-        public string Name { get; set; }
-        public string Description { get; set; }
-        public DateTime? Date { get; set; }
+        public string Content { get; set; }
+        public DateTime? EventDate { get; set; }
         [Required]
         public int UserId { get; set; }
         public User User { get; set; }
