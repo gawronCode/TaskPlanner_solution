@@ -46,7 +46,7 @@ namespace TaskPlanner.Controllers
             await _eventRepo.CreateAsync(new Event
             {
                 Content = eventDto.Content,
-                EventDate = DateTime.Now,
+                EventDate = eventDto.EventDate,
                 UserId = user.Id
             });
 
