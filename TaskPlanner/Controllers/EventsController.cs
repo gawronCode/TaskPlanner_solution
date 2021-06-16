@@ -37,22 +37,50 @@ namespace TaskPlanner.Controllers
             return Ok(events);
         }
 
+
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<Event>>> GetUserEvents()
+        {
+            var email = User.FindFirst(ClaimTypes.Email)?.Value;
+            var user = await _userRepo.GetByEmailAsync(email);
+
+            var events = await _eventRepo.GetAllByUserIdAsync(user.Id);
+            return Ok(events);
+        }
+
         [HttpPost]
         public async Task<ActionResult> Create(EventDto eventDto)
         {
             var email = User.FindFirst(ClaimTypes.Email)?.Value;
             var user = await _userRepo.GetByEmailAsync(email);
 
-            await _eventRepo.CreateAsync(new Event
+            var e = new Event
             {
                 Content = eventDto.Content,
                 EventDate = eventDto.EventDate,
                 UserId = user.Id
-            });
+            };
+
+            e.EventDate = e.EventDate.Value.AddHours(2);
+
+            await _eventRepo.CreateAsync(e);
 
             return Ok();
         }
 
+        [HttpPost]
+        public async Task<ActionResult> Delete(EventDto eventDto)
+        {
+            var email = User.FindFirst(ClaimTypes.Email)?.Value;
+            var user = await _userRepo.GetByEmailAsync(email);
+            var e = await _eventRepo.GetByIdAsync(eventDto.Id);
+
+            if (e.UserId != user.Id) return Unauthorized();
+
+            await _eventRepo.DeleteAsync(e);
+
+            return Ok();
+        }
 
 
     }

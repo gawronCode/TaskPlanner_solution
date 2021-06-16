@@ -26,9 +26,10 @@ namespace TaskPlanner.Repositories.Implementations
 
         }
 
-        public Task<bool> DeleteAsync(Event entity)
+        public async Task<bool> DeleteAsync(Event entity)
         {
-            throw new NotImplementedException();
+            _context.Events.Remove(entity);
+            return await SaveAsync();
         }
 
         public async Task<ICollection<Event>> GetAllAsync()
@@ -43,9 +44,9 @@ namespace TaskPlanner.Repositories.Implementations
             return userEvents;
         }
 
-        public Task<Event> GetByIdAsync(int id)
+        public async Task<Event> GetByIdAsync(int id)
         {
-            throw new NotImplementedException();
+            return await _context.Events.FirstOrDefaultAsync(q => q.Id == id);
         }
 
         public async Task<bool> SaveAsync()
