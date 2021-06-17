@@ -68,6 +68,24 @@ namespace TaskPlanner.Controllers
             return Ok();
         }
 
+
+        [HttpPut]
+        public async Task<ActionResult> Update(EventDto eventDto)
+        {
+            var email = User.FindFirst(ClaimTypes.Email)?.Value;
+            var user = await _userRepo.GetByEmailAsync(email);
+
+            var e = await _eventRepo.GetByIdAsync(eventDto.Id);
+
+            if (e.UserId != user.Id) return Unauthorized();
+
+            e.Content = eventDto.Content;
+            e.EventDate = eventDto.EventDate;
+            e.EventDate = e.EventDate.Value.AddHours(2);
+            await _eventRepo.UpdateAsync(e);
+            return Ok();
+        }
+
         [HttpPost]
         public async Task<ActionResult> Delete(EventDto eventDto)
         {

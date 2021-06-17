@@ -55,9 +55,10 @@ namespace TaskPlanner.Repositories.Implementations
             return changes > 0;
         }
 
-        public Task<bool> UpdateAsync(Event entity)
+        public async Task<bool> UpdateAsync(Event entity)
         {
-            throw new NotImplementedException();
+            _context.Events.Update(entity);
+            return await SaveAsync();
         }
     }
 }
